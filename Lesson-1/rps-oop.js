@@ -8,6 +8,7 @@ const readline = require('readline-sync');
 function createPlayer() {
   return {
     move: null,
+    score: 0,
   };
 }
 
@@ -47,15 +48,34 @@ function createHuman() {
 }
 
 const RPSGame = {
+  SCORE_TO_WIN: 3,
   human: createHuman(),
   computer: createComputer(),
 
   displayWelcomeMessage() {
     console.log('Welcome to Rock, Paper, Scissors!');
+    console.log('');
   },
 
   displayGoodbyeMessage() {
     console.log('Thanks for playing Rock, Paper, Scissors. Goodbye!');
+  },
+
+  displayScore() {
+    console.log('First to 3 wins!');
+    console.log('Current Score:');
+    console.log('================');
+    console.log(`Player Score: ${this.human.score}`);
+    console.log(`Computer Score: ${this.computer.score}`);
+    console.log('');
+  },
+
+  displayFinalScore() {
+    console.log('Final Score:');
+    console.log('================');
+    console.log(`Player Score: ${this.human.score}`);
+    console.log(`Computer Score: ${this.computer.score}`);
+    console.log('');
   },
 
   compare(humanMove, computerMove) {
@@ -64,12 +84,14 @@ const RPSGame = {
       (humanMove === 'paper' && computerMove === 'rock') ||
       (humanMove === 'scissors' && computerMove === 'paper')
     ) {
+      this.human.score += 1;
       console.log('You win!');
     } else if (
       (humanMove === 'rock' && computerMove === 'paper') ||
       (humanMove === 'paper' && computerMove === 'scissors') ||
       (humanMove === 'scissors' && computerMove === 'rock')
     ) {
+      this.computer.score += 1;
       console.log('Computer wins!');
     } else {
       console.log("It's a tie!");
@@ -92,15 +114,30 @@ const RPSGame = {
     return answer.toLowerCase()[0] === 'y';
   },
 
+  continue() {
+    console.log('');
+    console.log('Please press Enter to continue to next round.');
+    readline.question();
+  },
+
   play() {
+    console.clear();
     this.displayWelcomeMessage();
-    while (true) {
+
+    while (
+      this.human.score < this.SCORE_TO_WIN &&
+      this.computer.score < this.SCORE_TO_WIN
+    ) {
+      this.displayScore();
       this.human.choose();
       this.computer.choose();
       this.displayWinner();
-      if (!this.playAgain()) break;
+      this.continue();
+      // if (!this.playAgain()) break;
+      console.clear();
     }
 
+    this.displayFinalScore();
     this.displayGoodbyeMessage();
   },
 };
