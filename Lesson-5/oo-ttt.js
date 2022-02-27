@@ -69,8 +69,55 @@ class TTTGame {
   }
 
   play() {
+    // SPIKE
+    this.displayWelcomeMessage();
+
+    while (true) {
+      this.displayBoard();
+
+      this.firstPlayerMoves();
+      if (this.gameOver()) break;
+
+      this.secondPlayerMoves();
+      if (this.gameOver()) break;
+      break; // execute loop only once for now
+    }
+
+    this.displayResults();
+    this.displayGoodbyeMessage();
+  }
+
+  displayWelcomeMessage() {
+    console.log('Welcome to Tic Tac Toe!');
+  }
+
+  displayGoodbyeMessage() {
+    console.log('Thanks for playing Tic Tac Toe! Goodbye!');
+  }
+
+  displayResults() {
     // STUB
-    //  orchestrate game play
+    //  Show the results of this game (win, lose, tie)
+  }
+
+  displayBoard() {
+    // STUB
+    //  Display the board, including its current state
+  }
+
+  firstPlayerMoves() {
+    // STUB
+    //  The first player makes a move
+  }
+
+  secondPlayerMoves() {
+    // STUB
+    //  The second player makes a move
+  }
+
+  gameOver() {
+    // STUB
+    return false;
   }
 }
 
