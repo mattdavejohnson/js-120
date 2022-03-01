@@ -1,5 +1,27 @@
+/* eslint-disable no-mixed-operators */
+/* eslint-disable max-lines-per-function */
 /* eslint-disable no-useless-constructor */
 // OO Tic Tac Toe with Classes
+
+let readline = require('readline-sync');
+
+class Square {
+  static UNUSED_SQUARE = ' ';
+  static HUMAN_MARKER = 'X';
+  static COMPUTER_MARKER = 'O';
+
+  constructor(marker = Square.UNUSED_SQUARE) {
+    this.marker = marker;
+  }
+
+  toString() {
+    return this.marker;
+  }
+
+  setMarker(marker) {
+    this.marker = marker;
+  }
+}
 
 class Board {
   constructor() {
@@ -7,13 +29,36 @@ class Board {
     //  We need a way to model the 3x3 grid. Perhaps "squares"?
     //  What data structure should we use? Array? Object?
     //  What should the data structure store? Strings? Numbers? Square objects?
+    this.squares = {};
+    for (let counter = 1; counter <= 9; ++counter) {
+      this.squares[String(counter)] = new Square();
+    }
   }
-}
 
-class Square {
-  constructor() {
-    // STUB
-    //  We need some way to keep track of this square's marker.
+  markSquareAt(key, marker) {
+    this.squares[key].setMarker(marker);
+  }
+
+  display() {
+    console.log('');
+    console.log('     |     |');
+    console.log(
+      `  ${this.squares['1']}  |  ${this.squares['2']}  |  ${this.squares['3']}`
+    );
+    console.log('     |     |');
+    console.log('-----+-----+-----');
+    console.log('     |     |');
+    console.log(
+      `  ${this.squares['4']}  |  ${this.squares['5']}  |  ${this.squares['6']}`
+    );
+    console.log('     |     |');
+    console.log('-----+-----+-----');
+    console.log('     |     |');
+    console.log(
+      `  ${this.squares['7']}  |  ${this.squares['8']}  |  ${this.squares['9']}`
+    );
+    console.log('     |     |');
+    console.log('');
   }
 }
 
@@ -24,23 +69,13 @@ class Row {
   }
 }
 
-class Marker {
-  constructor() {
-    // STUB
-    //  A marker is something that represents a player's "piece" on the board.
-  }
-}
-
 class Player {
-  constructor() {
-    // STUB
-    //  maybe a "marker" to keep track of this player's symbol ('X' or 'O')
+  constructor(marker) {
+    this.marker = marker;
   }
 
-  mark() {
-    // STUB
-    //  We need a way to mark the board with this player's marker.
-    //  How do we access the board?
+  getMarker() {
+    return this.marker;
   }
 
   play() {
@@ -52,20 +87,21 @@ class Player {
 
 class Human extends Player {
   constructor() {
-    // STUB
+    super(Square.HUMAN_MARKER);
   }
 }
 
 class Computer extends Player {
   constructor() {
-    // STUB
+    super(Square.COMPUTER_MARKER);
   }
 }
 
 class TTTGame {
   constructor() {
-    // STUB
-    //  Need a board and two players
+    this.board = new Board();
+    this.human = new Human();
+    this.computer = new Computer();
   }
 
   play() {
@@ -73,12 +109,14 @@ class TTTGame {
     this.displayWelcomeMessage();
 
     while (true) {
-      this.displayBoard();
+      this.board.display();
 
-      this.firstPlayerMoves();
+      this.humanMoves();
+      this.board.display();
       if (this.gameOver()) break;
 
-      this.secondPlayerMoves();
+      this.computerMoves();
+      this.board.display();
       if (this.gameOver()) break;
       break; // execute loop only once for now
     }
@@ -100,19 +138,27 @@ class TTTGame {
     //  Show the results of this game (win, lose, tie)
   }
 
-  displayBoard() {
-    // STUB
-    //  Display the board, including its current state
+  humanMoves() {
+    let choice;
+
+    while (true) {
+      choice = readline.question('Choose a square between 1 and 9: ');
+
+      let integerValue = parseInt(choice, 10);
+      if (integerValue >= 1 && integerValue <= 9) {
+        break;
+      }
+
+      console.log("Sorry, that's not a valid choice.");
+      console.log('');
+    }
+
+    this.board.markSquareAt(choice, this.human.getMarker());
   }
 
-  firstPlayerMoves() {
-    // STUB
-    //  The first player makes a move
-  }
-
-  secondPlayerMoves() {
-    // STUB
-    //  The second player makes a move
+  computerMoves() {
+    let choice = Math.floor(9 * Math.random() + 1);
+    this.board.markSquareAt(choice, this.computer.getMarker());
   }
 
   gameOver() {
