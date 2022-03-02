@@ -32,10 +32,6 @@ class Square {
 
 class Board {
   constructor() {
-    // STUB
-    //  We need a way to model the 3x3 grid. Perhaps "squares"?
-    //  What data structure should we use? Array? Object?
-    //  What should the data structure store? Strings? Numbers? Square objects?
     this.squares = {};
     for (let counter = 1; counter <= 9; ++counter) {
       this.squares[String(counter)] = new Square();
@@ -134,7 +130,6 @@ class TTTGame {
   ];
 
   play() {
-    // SPIKE
     this.displayWelcomeMessage();
 
     this.board.display();
