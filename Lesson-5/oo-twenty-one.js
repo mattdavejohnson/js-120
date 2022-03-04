@@ -1,5 +1,7 @@
 // OO Twenty-One
 
+let readline = require('readline-sync');
+
 class Card {
   constructor(value, suit, points) {
     this.value = value;
@@ -94,6 +96,10 @@ class Participant {
     this.score = 0;
   }
 
+  hasBlackjack() {
+    return this.score === 21;
+  }
+
   isBusted() {
     return this.score > 21;
   }
@@ -101,20 +107,9 @@ class Participant {
   getScore() {
     return this.score;
   }
-}
 
-class Player extends Participant {
-  constructor() {
-    super();
-    this.money = 5;
-  }
-
-  hit() {
-    //STUB
-  }
-
-  stay() {
-    //STUB
+  getHand() {
+    return this.hand;
   }
 
   calculateScore() {
@@ -140,11 +135,10 @@ class Player extends Participant {
   }
 }
 
-class Dealer extends Participant {
-  // Very similar to a Player; do we need this?
-
+class Player extends Participant {
   constructor() {
     super();
+    this.money = 5;
   }
 
   hit() {
@@ -154,17 +148,21 @@ class Dealer extends Participant {
   stay() {
     //STUB
   }
+}
 
-  score() {
-    //STUB
+class Dealer extends Participant {
+  // Very similar to a Player; do we need this?
+
+  constructor() {
+    super();
   }
 
-  hide() {
-    //STUB
+  getOneCard() {
+    return this.hand[0];
   }
 
-  reveal() {
-    //STUB
+  mustStand() {
+    return this.score >= 17;
   }
 }
 
@@ -176,46 +174,124 @@ class TwentyOneGame {
   }
 
   start() {
-    console.clear();
     this.displayWelcomeMessage();
-    console.log('');
+    this.anyButton();
+    console.clear();
     this.dealCards();
     this.playerTurn();
+    if (this.player.isBusted()) {
+      this.playerBustedMessage();
+      return;
+    }
+    if (this.player.hasBlackjack()) {
+      this.playerHasBlackjackMessage();
+      return;
+    }
 
-    // this.dealerTurn();
-    // this.displayResult();
+    this.dealerTurn();
+    this.displayResult();
     console.log('');
     this.displayGoodbyeMessage();
   }
 
   dealCards() {
     this.player.hand = this.deck.dealHand();
-    this.player.updateScore();
     this.dealer.hand = this.deck.dealHand();
   }
 
   showCards() {
-    console.log(this.player);
+    this.displayPlayerHand();
+    this.displayPlayerScore();
     console.log('');
-    console.log(this.dealer);
+    this.displayOneDealerCard();
+  }
+
+  showBothDealerCards() {
+    this.displayPlayerHand();
+    this.displayPlayerScore();
+    console.log('');
+    this.displayAllDealerCards();
+    this.displayDealerScore();
   }
 
   playerTurn() {
-    this.displayPlayerHand();
-    this.playerHit();
-    this.displayPlayerHand();
+    this.showCards();
+
+    while (!this.player.isBusted() && !this.player.hasBlackjack()) {
+      if (this.wantToHit()) {
+        this.playerHit();
+        this.showCards();
+      } else {
+        break;
+      }
+    }
+  }
+
+  wantToHit() {
+    let answer;
+
+    while (true) {
+      console.log('');
+      answer = readline.question('Want to hit? (y/n) ').toLowerCase();
+
+      if (['y', 'n'].includes(answer)) break;
+
+      console.log("Sorry, that's not a valid choice.");
+    }
+
+    console.clear();
+    return answer === 'y';
   }
 
   playerHit() {
+    console.clear();
     this.player.hand.push(this.deck.dealCard());
     this.player.updateScore();
   }
 
+  playerBustedMessage() {
+    console.log('');
+    console.log('You busted! Sorry you lose.');
+    console.log('');
+    this.displayGoodbyeMessage();
+  }
+
+  playerHasBlackjackMessage() {
+    console.log('');
+    console.log('You have Blackjack! You win!');
+    console.log('');
+    this.displayGoodbyeMessage();
+  }
+
   dealerTurn() {
-    //STUB
+    this.showBothDealerCards();
+    this.anyButton();
+
+    while (
+      !this.dealer.isBusted() &&
+      !this.dealer.hasBlackjack() &&
+      !this.dealer.mustStand()
+    ) {
+      this.dealerHit();
+      this.showBothDealerCards();
+      this.anyButton();
+    }
+  }
+
+  dealerHit() {
+    console.clear();
+    this.dealer.hand.push(this.deck.dealCard());
+    this.dealer.updateScore();
+  }
+
+  anyButton() {
+    console.log('');
+    readline.question('***PRESS "ENTER" TO CONTINUE***');
+    console.log('');
   }
 
   displayWelcomeMessage() {
+    console.clear();
     console.log('Welcome to 21!');
   }
 
@@ -231,16 +307,55 @@ class TwentyOneGame {
     arr.forEach((obj) => {
       console.log(`${obj.getCard()}`);
     });
+  }
 
+  displayPlayerScore() {
+    this.player.updateScore();
     console.log('');
     console.log(`Current score: ${this.player.getScore()}`);
+  }
 
-    // console.log(`${this.player.hand[0].getCard()}`);
-    // console.log(`${this.player.hand[1].getCard()}`);
+  displayOneDealerCard() {
+    console.log("Dealer's current hand: ");
+    console.log('===================');
+    console.log(this.dealer.getOneCard().getCard());
+    console.log('Second card hidden');
+  }
+
+  displayAllDealerCards() {
+    console.log("Dealer's current hand: ");
+    console.log('===================');
+
+    let arr = this.dealer.hand;
+    arr.forEach((obj) => {
+      console.log(`${obj.getCard()}`);
+    });
+  }
+
+  displayDealerScore() {
+    this.dealer.updateScore();
+    console.log('');
+    console.log(`Dealer's current score: ${this.dealer.getScore()}`);
   }
 
   displayResult() {
-    //STUB
+    console.clear();
+    console.log('Final Score: ');
+    console.log('===================');
+    console.log(`Player: ${this.player.getScore()}`);
+    console.log(`Dealer: ${this.dealer.getScore()}`);
+    console.log('');
+    console.log(this.getResult());
+  }
+
+  getResult() {
+    if (this.player.getScore() > this.dealer.getScore()) {
+      return 'You win!';
+    } else if (this.player.getScore() < this.dealer.getScore()) {
+      return 'Dealer wins';
+    } else {
+      return "It's a tie!";
+    }
   }
 }
 
