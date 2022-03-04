@@ -178,28 +178,31 @@ class TwentyOneGame {
   start() {
     this.displayWelcomeMessage();
     this.anyButton();
-
-    // while player money is less than 10 and greater than 0
-    // reset the deck
-    // play as normal
-    // add/sub from money as needed
-
-    console.clear();
-    this.dealCards();
-    this.playerTurn();
-    if (this.player.isBusted()) {
-      this.playerBustedMessage();
-      return;
-    }
-    if (this.player.hasBlackjack()) {
-      this.playerHasBlackjackMessage();
-      return;
-    }
-
-    this.dealerTurn();
-    this.displayResult();
-    console.log('');
+    this.mainGame();
     this.displayGoodbyeMessage();
+  }
+
+  mainGame() {
+    while (this.player.getMoney() < 10 && this.player.getMoney() > 0) {
+      this.deck.reset();
+      console.clear();
+      this.dealCards();
+      this.playerTurn();
+
+      if (this.player.isBusted()) {
+        this.playerBustedMessage();
+        continue;
+      }
+      if (this.player.hasBlackjack()) {
+        this.playerHasBlackjackMessage();
+        continue;
+      }
+
+      this.dealerTurn();
+      this.displayResult();
+      console.log('');
+      this.anyButton();
+    }
   }
 
   dealCards() {
@@ -263,12 +266,18 @@ class TwentyOneGame {
     console.log('');
     console.log('You busted! Sorry you lose $1');
     console.log('');
+    this.player.subtractOneDollar();
+    this.displayPlayerMoney();
+    this.anyButton();
   }
 
   playerHasBlackjackMessage() {
     console.log('');
     console.log('You have Blackjack! You win $1!');
     console.log('');
+    this.player.addOneDollar();
+    this.displayPlayerMoney();
+    this.anyButton();
   }
 
   dealerTurn() {
@@ -304,16 +313,22 @@ class TwentyOneGame {
     console.log('');
     console.log('RULES: ');
     console.log('===================');
-    console.log('You start with 5 dollars.');
-    console.log('Each time you lose a hand, you lose 1 dollar.');
-    console.log('Each time you win a hand, you gain 1 dollar.');
-    console.log('You win the game if you get to 10 dollars.');
-    console.log('You lose the game if you get to 0 dollars');
+    console.log('You start with $5.');
+    console.log('Each time you lose a hand, you lose $1.');
+    console.log('Each time you win a hand, you gain $1.');
+    console.log('You win the game if you get to $10.');
+    console.log('You lose the game if you get to $0.');
     console.log('');
-    console.log('Have fun!');
+    console.log('Good luck! Have fun!');
   }
 
   displayGoodbyeMessage() {
+    if (this.player.getMoney() === 10) {
+      console.log('You got $10! You win!');
+    } else {
+      console.log('Sorry, you have $0. You lose.');
+    }
+    console.log('');
     console.log('Thank you for playing 21!');
   }
 
@@ -369,7 +384,7 @@ class TwentyOneGame {
     console.log('');
     console.log(this.getResult());
     console.log('');
-    console.log(this.displayPlayerMoney());
+    this.displayPlayerMoney();
   }
 
   getResult() {
