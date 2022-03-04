@@ -73,9 +73,6 @@ class Deck {
 
     for (let idx1 = 0; idx1 < Deck.SUITS.length; idx1 += 1) {
       for (let idx2 = 0; idx2 < Deck.VALUES.length; idx2 += 1) {
-        // let titleValue = Deck.VALUES[idx2][0];
-        // let titleSuit = Deck.SUITS[idx1][0];
-
         let propValue = Deck.VALUES[idx2][1];
         let propSuit = Deck.SUITS[idx1][1];
         let propPoints = Deck.VALUES[idx2][2];
