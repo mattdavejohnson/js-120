@@ -141,21 +141,23 @@ class Player extends Participant {
     this.money = 5;
   }
 
-  hit() {
-    //STUB
+  getMoney() {
+    return this.money;
   }
 
-  stay() {
-    //STUB
+  addOneDollar() {
+    this.money += 1;
+  }
+
+  subtractOneDollar() {
+    this.money -= 1;
   }
 }
 
 class Dealer extends Participant {
-  // Very similar to a Player; do we need this?
-
-  constructor() {
-    super();
-  }
+  // constructor() {
+  //   super();
+  // }
 
   getOneCard() {
     return this.hand[0];
@@ -176,6 +178,12 @@ class TwentyOneGame {
   start() {
     this.displayWelcomeMessage();
     this.anyButton();
+
+    // while player money is less than 10 and greater than 0
+    // reset the deck
+    // play as normal
+    // add/sub from money as needed
+
     console.clear();
     this.dealCards();
     this.playerTurn();
@@ -202,6 +210,7 @@ class TwentyOneGame {
   showCards() {
     this.displayPlayerHand();
     this.displayPlayerScore();
+    this.displayPlayerMoney();
     console.log('');
     this.displayOneDealerCard();
   }
@@ -209,6 +218,7 @@ class TwentyOneGame {
   showBothDealerCards() {
     this.displayPlayerHand();
     this.displayPlayerScore();
+    this.displayPlayerMoney();
     console.log('');
     this.displayAllDealerCards();
     this.displayDealerScore();
@@ -251,16 +261,14 @@ class TwentyOneGame {
 
   playerBustedMessage() {
     console.log('');
-    console.log('You busted! Sorry you lose.');
+    console.log('You busted! Sorry you lose $1');
     console.log('');
-    this.displayGoodbyeMessage();
   }
 
   playerHasBlackjackMessage() {
     console.log('');
-    console.log('You have Blackjack! You win!');
+    console.log('You have Blackjack! You win $1!');
     console.log('');
-    this.displayGoodbyeMessage();
   }
 
   dealerTurn() {
@@ -293,6 +301,16 @@ class TwentyOneGame {
   displayWelcomeMessage() {
     console.clear();
     console.log('Welcome to 21!');
+    console.log('');
+    console.log('RULES: ');
+    console.log('===================');
+    console.log('You start with 5 dollars.');
+    console.log('Each time you lose a hand, you lose 1 dollar.');
+    console.log('Each time you win a hand, you gain 1 dollar.');
+    console.log('You win the game if you get to 10 dollars.');
+    console.log('You lose the game if you get to 0 dollars');
+    console.log('');
+    console.log('Have fun!');
   }
 
   displayGoodbyeMessage() {
@@ -313,6 +331,10 @@ class TwentyOneGame {
     this.player.updateScore();
     console.log('');
     console.log(`Current score: ${this.player.getScore()}`);
+  }
+
+  displayPlayerMoney() {
+    console.log(`Current money: $${this.player.getMoney()}`);
   }
 
   displayOneDealerCard() {
@@ -346,13 +368,20 @@ class TwentyOneGame {
     console.log(`Dealer: ${this.dealer.getScore()}`);
     console.log('');
     console.log(this.getResult());
+    console.log('');
+    console.log(this.displayPlayerMoney());
   }
 
   getResult() {
-    if (this.player.getScore() > this.dealer.getScore()) {
-      return 'You win!';
+    if (
+      this.player.getScore() > this.dealer.getScore() ||
+      this.dealer.isBusted()
+    ) {
+      this.player.addOneDollar();
+      return 'Congratulations! You win $1!';
     } else if (this.player.getScore() < this.dealer.getScore()) {
-      return 'Dealer wins';
+      this.player.subtractOneDollar();
+      return 'Dealer wins. Sorry you lose $1';
     } else {
       return "It's a tie!";
     }
